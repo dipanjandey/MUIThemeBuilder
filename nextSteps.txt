@@ -1,0 +1,4 @@
+->review all files
+->fix reset in both tabs
+->why is editing styles from the code editor tab breaking the right panel and loading more theme objects?
+--->on update paletteeditor/ paletteeditor brings the whole MUI theme, which breaks things
