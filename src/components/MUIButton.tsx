@@ -72,9 +72,6 @@ const MUIButton = () => {
           <Button variant="outlined" startIcon={<DeleteIcon />}>
             Delete
           </Button>
-          <Button variant="contained" endIcon={<SendIcon />}>
-            Send
-          </Button>
         </Stack>
       </Stack>
     </Paper>
