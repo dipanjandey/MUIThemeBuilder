@@ -23,12 +23,13 @@ import MUIRating from "./components/MUIRating";
 import MUISelect from "./components/MUISelect";
 import MUISlider from "./components/MUISlider";
 import MUISwitch from "./components/MUISwitch";
-import ThemeEditor from "./components/ThemeEditor";
-import PaletteEditor from "./components/PaletteEditor";
+import ThemeEditor from "./components/ThemeEditor/ThemeEditor";
+import VisualEditorTab from "./components/VisualEditorTab/VisualEditorTab";
 import { updateThemeConfig } from "./store/themeSlice";
 import { selectTheme, selectThemeConfig } from "./store/themeSlice";
 import { ThemeOptions } from "@mui/material/styles";
 import "./App.css";
+import baseTheme from "./theme";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,23 +65,8 @@ function App() {
     setSelectedTab(newValue);
   };
 
-  const handleThemeChange = (newTheme: typeof theme) => {
-    // Extract theme options from the complete theme and update the store
-    const { palette, typography, shape, spacing, breakpoints, components } =
-      newTheme;
-    dispatch(
-      updateThemeConfig({
-        palette,
-        typography,
-        shape,
-        spacing,
-        breakpoints,
-        components,
-      })
-    );
-  };
-
   const handleThemeOptionsChange = (newThemeOptions: ThemeOptions) => {
+    // Update the Redux store with just the edited theme options
     dispatch(updateThemeConfig(newThemeOptions));
   };
 
@@ -110,7 +96,7 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={baseTheme}>
       <CssBaseline />
       <Box sx={{ height: "100vh", overflow: "hidden" }}>
         <Container maxWidth="xl" sx={{ py: 4, height: "100%" }}>
@@ -139,7 +125,7 @@ function App() {
                 </Paper>
                 <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
                   <TabPanel value={selectedTab} index={0}>
-                    <PaletteEditor theme={theme} onChange={handleThemeChange} />
+                    <VisualEditorTab />
                   </TabPanel>
                   <TabPanel value={selectedTab} index={1}>
                     <ThemeEditor
@@ -181,7 +167,9 @@ function App() {
                   </Select>
                 </FormControl>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  {renderSelectedComponent()}
+                  <ThemeProvider theme={theme}>
+                    {renderSelectedComponent()}
+                  </ThemeProvider>
                 </Box>
               </Paper>
             </Grid>
