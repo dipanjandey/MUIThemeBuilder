@@ -11,8 +11,10 @@ import {
 } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ColorizeIcon from "@mui/icons-material/Colorize";
-import { SketchPicker } from "react-color";
+import { SketchPicker, ColorResult } from "react-color";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { useDispatch } from "react-redux";
+import { updateThemeConfig, resetTheme } from "../store/themeSlice";
 import baseTheme from "../theme";
 
 interface ColorPickerProps {
@@ -79,7 +81,7 @@ const ColorPickerField: React.FC<ColorPickerProps> = ({
           />
           <SketchPicker
             color={color}
-            onChange={(color) => onChange(color.hex)}
+            onChange={(color: ColorResult) => onChange(color.hex)}
           />
         </Box>
       )}
@@ -97,10 +99,12 @@ interface ColorSet {
 
 interface PaletteEditorProps {
   theme: Theme;
-  onChange: (newTheme: Theme) => void;
+  onChange?: (newTheme: Theme) => void; // Made optional
 }
 
 const PaletteEditor: React.FC<PaletteEditorProps> = ({ theme, onChange }) => {
+  const dispatch = useDispatch();
+
   const updateColor = (
     colorType:
       | "primary"
@@ -112,25 +116,45 @@ const PaletteEditor: React.FC<PaletteEditorProps> = ({ theme, onChange }) => {
     variant: keyof ColorSet,
     value: string
   ) => {
-    const newTheme = {
-      ...theme,
-      palette: {
-        ...theme.palette,
-        [colorType]: {
-          ...theme.palette[colorType],
-          [variant]: value,
-        },
+    // Create a new theme object with updated color
+    const updatedPalette = {
+      ...theme.palette,
+      [colorType]: {
+        ...theme.palette[colorType],
+        [variant]: value,
       },
     };
-    onChange(newTheme);
+
+    // Update the theme in Redux store
+    dispatch(
+      updateThemeConfig({
+        ...theme,
+        palette: updatedPalette,
+      })
+    );
+
+    // For backward compatibility
+    if (onChange) {
+      const newTheme = {
+        ...theme,
+        palette: updatedPalette,
+      };
+      onChange(newTheme);
+    }
   };
 
   const handleReset = () => {
-    const newTheme = {
-      ...theme,
-      palette: baseTheme.palette,
-    };
-    onChange(newTheme);
+    // Reset theme in Redux store
+    dispatch(resetTheme());
+
+    // For backward compatibility
+    if (onChange) {
+      const newTheme = {
+        ...theme,
+        palette: baseTheme.palette,
+      };
+      onChange(newTheme);
+    }
   };
 
   const colorSets: Array<{

@@ -12,7 +12,8 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { useState, useCallback } from "react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import MUIButton from "./components/MUIButton";
 import MUIInput from "./components/MUIInput";
 import MUIAutocomplete from "./components/MUIAutocomplete";
@@ -24,8 +25,9 @@ import MUISlider from "./components/MUISlider";
 import MUISwitch from "./components/MUISwitch";
 import ThemeEditor from "./components/ThemeEditor";
 import PaletteEditor from "./components/PaletteEditor";
-import { Theme } from "@mui/material/styles";
-import baseTheme, { theme as initialTheme } from "./theme"; // Import `theme` for initial code editor content
+import { updateThemeConfig } from "./store/themeSlice";
+import { selectTheme, selectThemeConfig } from "./store/themeSlice";
+import { ThemeOptions } from "@mui/material/styles";
 import "./App.css";
 
 interface TabPanelProps {
@@ -51,21 +53,35 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function App() {
-  const [currentTheme, setCurrentTheme] = useState<Theme>(baseTheme);
+  const dispatch = useDispatch();
+  const theme = useSelector(selectTheme);
+  const themeConfig = useSelector(selectThemeConfig);
+
   const [selectedComponent, setSelectedComponent] = useState<string>("button");
   const [selectedTab, setSelectedTab] = useState(0);
-  const [themeString, setThemeString] = useState(
-    () => JSON.stringify(initialTheme, null, 2) // Load initial theme from `theme.ts`
-  );
-
-  const handleThemeChange = useCallback((newTheme: Theme) => {
-    console.log("Theme updated:", newTheme);
-    setCurrentTheme(newTheme);
-    setThemeString(JSON.stringify(newTheme, null, 2)); // Update the theme string
-  }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
+  };
+
+  const handleThemeChange = (newTheme: typeof theme) => {
+    // Extract theme options from the complete theme and update the store
+    const { palette, typography, shape, spacing, breakpoints, components } =
+      newTheme;
+    dispatch(
+      updateThemeConfig({
+        palette,
+        typography,
+        shape,
+        spacing,
+        breakpoints,
+        components,
+      })
+    );
+  };
+
+  const handleThemeOptionsChange = (newThemeOptions: ThemeOptions) => {
+    dispatch(updateThemeConfig(newThemeOptions));
   };
 
   const renderSelectedComponent = () => {
@@ -94,7 +110,7 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={currentTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ height: "100vh", overflow: "hidden" }}>
         <Container maxWidth="xl" sx={{ py: 4, height: "100%" }}>
@@ -123,15 +139,13 @@ function App() {
                 </Paper>
                 <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
                   <TabPanel value={selectedTab} index={0}>
-                    <PaletteEditor
-                      theme={currentTheme}
-                      onChange={handleThemeChange}
-                    />
+                    <PaletteEditor theme={theme} onChange={handleThemeChange} />
                   </TabPanel>
                   <TabPanel value={selectedTab} index={1}>
                     <ThemeEditor
-                      theme={JSON.parse(themeString)} // Pass the parsed theme string
-                      onThemeChange={handleThemeChange}
+                      theme={themeConfig}
+                      initialTheme={themeConfig}
+                      onThemeChange={handleThemeOptionsChange}
                     />
                   </TabPanel>
                 </Box>

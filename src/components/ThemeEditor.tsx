@@ -9,75 +9,45 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import Editor from "@monaco-editor/react";
-import { Theme, createTheme, ThemeOptions } from "@mui/material/styles";
+import { ThemeOptions } from "@mui/material/styles";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateThemeConfig, resetTheme } from "../store/themeSlice";
 
 interface ThemeEditorProps {
   theme: ThemeOptions;
-  onThemeChange: (newTheme: Theme) => void;
+  initialTheme: ThemeOptions;
+  onThemeChange?: (newTheme: ThemeOptions) => void; // Optional now
 }
 
-// Function to validate and ensure all required color variants are present
-const validateTheme = (themeObject: ThemeOptions): ThemeOptions => {
-  const requiredColors = [
-    "primary",
-    "secondary",
-    "error",
-    "warning",
-    "info",
-    "success",
-  ];
-  const requiredVariants = ["main", "light", "dark"];
-
-  const validatedTheme = { ...themeObject };
-
-  if (!validatedTheme.palette) {
-    validatedTheme.palette = {};
-  }
-
-  requiredColors.forEach((color) => {
-    if (!validatedTheme.palette?.[color]) {
-      validatedTheme.palette[color] = {};
-    }
-
-    const colorObj = validatedTheme.palette[color];
-
-    // Ensure all required variants exist
-    requiredVariants.forEach((variant) => {
-      if (!colorObj?.[variant]) {
-        // If main is missing, use a default color
-        if (variant === "main") {
-          colorObj.main = "#000000";
-        } else if (variant === "light") {
-          // If light is missing but main exists, lighten main
-          colorObj.light = colorObj.main || "#000000";
-        } else if (variant === "dark") {
-          // If dark is missing but main exists, darken main
-          colorObj.dark = colorObj.main || "#000000";
-        }
-      }
-    });
-  });
-
-  return validatedTheme;
-};
-
-const ThemeEditor: React.FC<ThemeEditorProps> = ({ theme, onThemeChange }) => {
+const ThemeEditor: React.FC<ThemeEditorProps> = ({
+  initialTheme,
+  theme,
+  onThemeChange,
+}) => {
+  const dispatch = useDispatch();
   const [error, setError] = useState<string | null>(null);
-  const [currentValue, setCurrentValue] = useState(
+  const [currentTheme, setCurrentTheme] = useState(
     () => JSON.stringify(theme, null, 2) // Initialize with the provided theme
   );
 
   useEffect(() => {
-    setCurrentValue(JSON.stringify(theme, null, 2)); // Update editor content when theme changes
+    setCurrentTheme(JSON.stringify(theme, null, 2)); // Update editor content when theme changes
   }, [theme]);
 
   const handleSave = () => {
     try {
-      const themeObject = JSON.parse(currentValue); // Parse the editor content
-      const validatedTheme = validateTheme(themeObject); // Validate the theme
-      const newTheme = createTheme(validatedTheme); // Create a new theme
-      onThemeChange(newTheme); // Notify parent component
+      const themeObject = JSON.parse(currentTheme); // Parse the editor content
+
+      // Update the Redux store
+      dispatch(updateThemeConfig(themeObject));
+
+      // For backward compatibility
+      if (onThemeChange) {
+        onThemeChange(themeObject);
+      }
+
+      setError(null);
     } catch (error) {
       console.error("Error parsing theme:", error);
       setError(
@@ -87,7 +57,9 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({ theme, onThemeChange }) => {
   };
 
   const handleReset = () => {
-    setCurrentValue(JSON.stringify(theme, null, 2));
+    // Reset to default theme in Redux store
+    dispatch(resetTheme());
+    setCurrentTheme(JSON.stringify(initialTheme, null, 2));
     setError(null);
   };
 
@@ -136,9 +108,9 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({ theme, onThemeChange }) => {
       )}
       <Editor
         height="calc(100vh - 200px)"
-        defaultLanguage="typescript"
-        value={currentValue} // Display the current theme string
-        onChange={(value) => setCurrentValue(value || "")} // Update state on editor change
+        defaultLanguage="json"
+        value={currentTheme} // Display the current theme string
+        onChange={(value) => setCurrentTheme(value || "")} // Update state on editor change
         options={{
           minimap: { enabled: false },
           fontSize: 14,

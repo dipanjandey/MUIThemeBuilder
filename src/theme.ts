@@ -1,6 +1,6 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
-declare module '@mui/material/styles' {
+declare module "@mui/material/styles" {
   interface PaletteColor {
     lighter?: string;
     darker?: string;
@@ -14,38 +14,38 @@ declare module '@mui/material/styles' {
 export const theme = {
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
-      lighter: '#e3f2fd',
-      darker: '#0d47a1',
+      main: "#1976d2",
+      light: "#42a5f5",
+      dark: "#1565c0",
+      lighter: "#e3f2fd",
+      darker: "#0d47a1",
     },
     secondary: {
-      main: '#9c27b0',
-      light: '#ba68c8',
-      dark: '#7b1fa2',
-      lighter: '#f3e5f5',
-      darker: '#4a148c',
+      main: "#9c27b0",
+      light: "#ba68c8",
+      dark: "#7b1fa2",
+      lighter: "#f3e5f5",
+      darker: "#4a148c",
     },
     error: {
-      main: '#d32f2f',
-      light: '#ef5350',
-      dark: '#c62828',
+      main: "#d32f2f",
+      light: "#ef5350",
+      dark: "#c62828",
     },
     warning: {
-      main: '#ed6c02',
-      light: '#ff9800',
-      dark: '#e65100',
+      main: "#ed6c02",
+      light: "#ff9800",
+      dark: "#e65100",
     },
     info: {
-      main: '#0288d1',
-      light: '#03a9f4',
-      dark: '#01579b',
+      main: "#0288d1",
+      light: "#03a9f4",
+      dark: "#01579b",
     },
     success: {
-      main: '#2e7d32',
-      light: '#4caf50',
-      dark: '#1b5e20',
+      main: "#2e7d32",
+      light: "#4caf50",
+      dark: "#1b5e20",
     },
   },
   components: {
@@ -53,18 +53,18 @@ export const theme = {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          textTransform: 'none',
+          textTransform: "none",
           fontWeight: 600,
         },
         contained: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: 'none',
+          boxShadow: "none",
+          "&:hover": {
+            boxShadow: "none",
           },
         },
         outlined: {
           borderWidth: 2,
-          '&:hover': {
+          "&:hover": {
             borderWidth: 2,
           },
         },
@@ -76,10 +76,10 @@ export const theme = {
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
+          "& .MuiOutlinedInput-root": {
             borderRadius: 8,
-            '&.Mui-focused': {
-              '& .MuiOutlinedInput-notchedOutline': {
+            "&.Mui-focused": {
+              "& .MuiOutlinedInput-notchedOutline": {
                 borderWidth: 2,
               },
             },
@@ -87,7 +87,7 @@ export const theme = {
         },
       },
       defaultProps: {
-        variant: 'outlined',
+        variant: "outlined",
       },
     },
     MuiPaper: {
@@ -104,11 +104,11 @@ export const theme = {
     },
     h5: {
       fontWeight: 600,
-      marginBottom: '1rem',
+      marginBottom: "1rem",
     },
     subtitle1: {
       fontWeight: 500,
-      color: '#666',
+      color: "#666",
     },
   },
   shape: {
